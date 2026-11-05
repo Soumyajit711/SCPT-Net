@@ -1,4 +1,4 @@
-# 🧬 Support-Conditioned Prototype Transport for Few-Shot-based Medical Image Classification
+# Support-Conditioned Prototype Transport for Few-Shot-based Medical Image Classification
 
 ## 🎯 Abstract
 
