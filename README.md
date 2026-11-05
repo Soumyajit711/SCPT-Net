@@ -4,11 +4,16 @@
 
 Few-shot learning (FSL) recognises unseen medical classes from a few labelled images, but most metric-based methods reduce each image and each class to a single vector, discarding local and heterogeneous lesion evidence. We propose SCPT (Support-Conditioned Prototype Transport), which matches sets of local query tokens to sets of class prototype atoms. SCPT encodes images as multi-scale local tokens, builds a diversity-adaptive number of atoms per class refined by optimal transport, and classifies queries by Sinkhorn distance. The framework employs a lightweight shared encoder as a backbone and is optimised end-to-end using an episodic cross-entropy objective. Extensive experiments on three benchmark datasets (HAM10000, Kvasir, and BreakHis) demonstrate that our proposed SCPT consistently outperforms state-of-the-art methods, achieving superior 2-way balanced accuracies across both 5-shot (84.88\%, 68.37\%, and 58.80\%) and 10-shot (86.43\%, 70.68\%, and 62.20\%) settings. Overall, this SCPT framework proves highly effective in extremely low-resource settings, marking a significant step toward practical, label-efficient medical image classification.
 
-## 🤝 Contribution
+## Central Research Hypothesis
 
-1) **Multi-Scale Token-to-Prototype Optimal Transport:** We represent each query image as a set of multi-scale local tokens and each class as a compact set of prototype atoms. Their correspondence is established through Sinkhorn-based Optimal Transport (OT), replacing conventional global-vector matching used in metric-based few-shot learning methods.
-2) **Adaptive Prototype Capacity and OT-Based Refinement:** We introduce a support-diversity-driven mechanism that adaptively determines the number of prototype atoms per class. These atoms are further refined through entropic OT-barycentric updates to capture intra-class variations more effectively.
-3) **Comprehensive Medical Imaging Evaluation:** We evaluate the proposed framework across three medical imaging benchmarks: HAM10000 (dermoscopy), Kvasir (endoscopy), and BreakHis (histopathology). We further conduct extensive intra-module ablation studies and cross-dataset generalization experiments to investigate the effectiveness and transferability of the proposed approach.
+Few-shot medical image classification can benefit from representing images through multi-scale local feature distributions, constructing support-diversity-aware multi-atom class prototypes, and performing distribution-level query-to-class matching through entropy-regularized optimal transport.
+
+## Key Methodological Contributions
+
+1. **Local token-based representation:** SCPT preserves spatially distributed local representations rather than relying exclusively on a single global image vector.
+2. **Support-diversity-driven prototype construction:** The number of prototype atoms is adapted to the observed diversity of each class's support set.
+3. **OT-based distribution matching:** Query-token distributions are compared with adaptive prototype distributions through entropy-regularized optimal transport.
+4. **Cross-domain evaluation:** The framework is evaluated across dermoscopic, endoscopic, and histopathological datasets, including cross-dataset generalization experiments.
 
 ## Overview
 
@@ -77,17 +82,6 @@ In the cross-dataset evaluation protocol, no target-dataset fine-tuning is perfo
 - **MER — Multi-scale Embedding Representation:** Extracts multi-level image features, fuses them, and generates normalized local tokens.
 - **SAPC — Support-Adaptive Prototype Construction:** Estimates support diversity, determines the number of atoms per class, initializes them using FPS, and refines them through OT-barycentric updates.
 - **QPM — Query-to-Prototype Matching:** Computes query-token-to-atom costs, estimates Sinkhorn transport plans, and classifies queries using transport distances.
-
-## Key Methodological Contributions
-
-1. **Local token-based representation:** SCPT preserves spatially distributed local representations rather than relying exclusively on a single global image vector.
-2. **Support-diversity-driven prototype construction:** The number of prototype atoms is adapted to the observed diversity of each class's support set.
-3. **OT-based distribution matching:** Query-token distributions are compared with adaptive prototype distributions through entropy-regularized optimal transport.
-4. **Cross-domain evaluation:** The framework is evaluated across dermoscopic, endoscopic, and histopathological datasets, including cross-dataset generalization experiments.
-
-## Central Research Hypothesis
-
-Few-shot medical image classification can benefit from representing images through multi-scale local feature distributions, constructing support-diversity-aware multi-atom class prototypes, and performing distribution-level query-to-class matching through entropy-regularized optimal transport.
 
 In summary:
 
