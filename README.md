@@ -24,6 +24,9 @@ The framework consists of three interconnected modules:
 
 ## Methodological Overview
 
+<img width="1561" height="422" alt="image" src="https://github.com/user-attachments/assets/a54b711f-7de3-4a7e-8b42-a780899bea64" />
+**Figure 1:** Overview of the proposed SCPT framework. MER extracts multi-scale features as normalized tokens. SAPC constructs class-specific prototypes using support diversity, farthest-point sampling, and balanced matching. QPM performs Sinkhorn-based query-to-prototype matching for class prediction.
+
 ### Overall Pipeline
 
 Input medical images (support set and query image)
@@ -342,10 +345,7 @@ The evaluation includes:
 - Cross-dataset transfer without target fine-tuning.
 - Balanced accuracy reported as mean ± standard deviation over five random seeds and 2,000 test episodes, where applicable.
 
-
-
-<img width="1561" height="422" alt="image" src="https://github.com/user-attachments/assets/a54b711f-7de3-4a7e-8b42-a780899bea64" />
-**Figure 1:** Overview of the proposed SCPT framework. MER extracts multi-scale features as normalized tokens. SAPC constructs class-specific prototypes using support diversity, farthest-point sampling, and balanced matching. QPM performs Sinkhorn-based query-to-prototype matching for class prediction.
+## Quantitative Results
 
 ## Table 1. Comparison of methods in terms of 2-way balanced accuracy (\%), reported as mean $\pm$ standard deviation over five random seeds and 2,000 test episodes.
 | Method | HAM10000 (5-shot) | HAM10000 (10-shot) | Kvasir (5-shot) | Kvasir (10-shot) | BreakHis (5-shot) | BreakHis (10-shot) |
@@ -388,6 +388,7 @@ The evaluation includes:
 | **Kvasir →** | 59.15 ± 1.46 | 61.93 ± 1.41 | 70.68 ± 2.04 | 73.94 ± 2.74 | 57.39 ± 1.79 | 63.60 ± 2.51 |
 | **BreakHis →** | 61.49 ± 1.08 | 65.28 ± 2.76 | 76.44 ± 2.28 | 76.20 ± 2.23 | 58.80 ± 1.28 | 62.20 ± 2.57 |
 
+## Qualitative Results
 
 <img width="564" height="202" alt="image" src="https://github.com/user-attachments/assets/e2fede5b-667c-4827-905c-813075111636" />
 
