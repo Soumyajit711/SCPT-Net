@@ -60,7 +60,7 @@ Few-shot learning (FSL) recognises unseen medical classes from a few labelled im
 **Figure 4:**
 
 <img width="544" height="177" alt="image" src="https://github.com/user-attachments/assets/b0a667bb-1bd0-42e9-944c-78ac0d0f190d" />
-**Figure 5:**
+**Figure 5:** Qualitative visualization of optimal transport-based prototype assignment. Given a query image and two support examples (true class: ulcerative colitis; predicted class: polyps), the corresponding transport plans \(T^*\) illustrate the query-token-to-atom correspondence. The reported raw OT distances (\(D=0.313\) for the true class and \(D=0.223\) for the predicted class) indicate stronger transport affinity toward the predicted polyp prototype, consistent with the model's classification decision.
 
 
 
