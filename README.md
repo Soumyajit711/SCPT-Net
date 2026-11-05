@@ -51,15 +51,19 @@ Few-shot learning (FSL) recognises unseen medical classes from a few labelled im
 
 
 <img width="564" height="202" alt="image" src="https://github.com/user-attachments/assets/e2fede5b-667c-4827-905c-813075111636" />
-**Figure 2:**
+
+**Figure 2:** Qualitative visualization of SCPT-based optimal transport matching for a dermatological query image. The query is compared against the true-class and predicted-class support prototypes, with the corresponding transport plans \(T^*\) illustrating query-token-to-atom assignments. The identical raw OT distances (\(D=0.231\)) for both support configurations indicate comparable transport costs, highlighting the ambiguity in prototype-level matching.
 
 <img width="552" height="184" alt="image" src="https://github.com/user-attachments/assets/ecd13664-12ea-49ed-b968-79f11d269aa2" />
-**Figure 3:**
+
+**Figure 3:** Qualitative visualization of optimal transport-based prototype matching for a dermoscopic query image. The query is compared against the true-class (nevus, NV) and predicted-class (vascular lesion, VASC) support prototypes. The corresponding transport plans \(T^*\) visualize query-token-to-atom assignments. The lower raw OT distance for the predicted class (\(D=0.250\)) compared with the true class (\(D=0.488\)) indicates stronger prototype affinity toward VASC, explaining the model's misclassification.
 
 <img width="546" height="182" alt="image" src="https://github.com/user-attachments/assets/fe20820a-ba7d-416d-95e1-909c5cd49188" />
-**Figure 4:**
+
+**Figure 4:** Qualitative visualization of optimal transport-based prototype matching for a gastrointestinal endoscopic query image. The query is compared against the true-class (polyps) and predicted-class (polyps) support prototypes. The corresponding transport plans \(T^*\) illustrate query-token-to-atom assignments. Identical raw OT distances (\(D=0.225\)) for both configurations indicate consistent prototype matching, supporting the correct classification of the query as a polyp.
 
 <img width="544" height="177" alt="image" src="https://github.com/user-attachments/assets/b0a667bb-1bd0-42e9-944c-78ac0d0f190d" />
+
 **Figure 5:** Qualitative visualization of optimal transport-based prototype assignment. Given a query image and two support examples (true class: ulcerative colitis; predicted class: polyps), the corresponding transport plans \(T^*\) illustrate the query-token-to-atom correspondence. The reported raw OT distances (\(D=0.313\) for the true class and \(D=0.223\) for the predicted class) indicate stronger transport affinity toward the predicted polyp prototype, consistent with the model's classification decision.
 
 
