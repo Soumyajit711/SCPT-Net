@@ -52,16 +52,6 @@ For each training episode:
 11. Calculate class-wise transport distances.
 12. Predict query labels and optimize the episodic classification objective.
 
-A representative classification loss is:
-
-    L_episodic = -(1/N_q) Σ_i log[
-        exp(-D(q_i,y_i)/tau) /
-        Σ_c exp(-D(q_i,c)/tau)
-    ]
-
-where N_q is the number of query samples, y_i is the ground-truth class, D(q_i,c) is the transport distance, and tau is a temperature parameter.
-
-The exact loss, optimization schedule, and whether the prototype refinement is differentiable should be reported according to the actual implementation.
 
 ### Inference
 
