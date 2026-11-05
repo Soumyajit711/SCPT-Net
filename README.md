@@ -28,207 +28,9 @@ The framework consists of three interconnected modules:
 **Figure 1:** Overview of the proposed SCPT framework. MER extracts multi-scale features as normalized tokens. SAPC constructs class-specific prototypes using support diversity, farthest-point sampling, and balanced matching. QPM performs Sinkhorn-based query-to-prototype matching for class prediction.
 
 
-## 1. Multi-scale Embedding Representation (MER) Module
+## Training and Inference
 
-### 1.1 Motivation
-
-Medical images contain discriminative characteristics at different spatial and semantic scales. Dermoscopic images may contain lesion boundaries and pigmentation patterns; endoscopic images may contain mucosal structures and localized abnormalities; and histopathological images may contain cellular arrangements and tissue-level morphology.
-
-A single global representation can suppress these localized variations. MER therefore extracts complementary features at multiple encoder stages and converts the fused representation into a set of local tokens.
-
-### 1.2 Multi-scale Feature Extraction
-
-Given an input image:
-
-    X ∈ R^(H0 × W0 × 3)
-
-a pretrained encoder extracts intermediate feature maps:
-
-    F2, F3, FB
-
-where F2, F3, and FB denote intermediate-, deeper-, and bottleneck-level representations, respectively.
-
-### 1.3 Feature Alignment and Fusion
-
-The feature maps are spatially aligned and projected into a common embedding space:
-
-    Fhat_i = Proj_i(Resize(F_i))
-
-The aligned features are fused:
-
-    F(X) = Fuse(Fhat_2, Fhat_3, Fhat_B)
-
-For the described configuration, the fused representation may have dimensions:
-
-    F(X) ∈ R^(128 × 14 × 14)
-
-The precise dimensions depend on the encoder and configuration used.
-
-### 1.4 Local Token Generation
-
-The fused feature map is flattened into spatially distributed local tokens:
-
-    U(X) = {u_1, u_2, ..., u_P}
-
-For a 14 × 14 feature map:
-
-    P = 14 × 14 = 196
-
-Each token is a 128-dimensional vector:
-
-    u_p ∈ R^128
-
-The resulting representation is:
-
-    U(X) ∈ R^(196 × 128)
-
-Positional information may be incorporated before L2 normalization. The same representation procedure is applied to support and query images.
-
-**Output:** A normalized set of local feature tokens for each input image.
-
-## 2. Support-Adaptive Prototype Construction (SAPC) Module
-
-### 2.1 Motivation
-
-Conventional prototype-based few-shot classification often represents each class using a single mean feature vector:
-
-    p_c = (1/K) Σ_k g_(c,k)
-
-This can be restrictive when support examples within a medical category exhibit substantial morphological variation. SAPC instead constructs multiple prototype atoms per class and adapts the number of atoms according to the diversity observed in the support set.
-
-### 2.2 Support Representation and Diversity Estimation
-
-For class c, let the support set be:
-
-    S_c = {X_(c,1), X_(c,2), ..., X_(c,K)}
-
-Each support image is processed by MER. An image-level descriptor can be obtained by aggregating its local tokens:
-
-    g_(c,k) = Normalize((1/P) Σ_p u_(c,k,p))
-
-The class mean descriptor is:
-
-    gbar_c = (1/K) Σ_k g_(c,k)
-
-A representative support-dispersion measure is:
-
-    delta_c = (1/K) Σ_k ||g_(c,k) - gbar_c||_2
-
-The diversity score estimates the variation among the support descriptors.
-
-### 2.3 Adaptive Prototype Capacity
-
-The number of atoms for class c is determined using the measured support diversity. A representative formulation is:
-
-    M_c = clip(round(K(1 + delta_c)), m_min, m_max)
-
-where M_c is the number of atoms, K is the number of support examples, delta_c is the diversity score, and m_min and m_max are capacity bounds.
-
-This formulation is illustrative; the exact scaling and capacity bounds should match the implementation used in the experiments.
-
-### 2.4 Farthest Point Sampling
-
-The local tokens from all support images of class c are combined:
-
-    U_c = Union_k U(X_(c,k))
-
-For K support images and P tokens per image:
-
-    U_c ∈ R^(KP × 128)
-
-Farthest Point Sampling selects M_c representative initial atoms:
-
-    B_c^(0) = FPS(U_c, M_c)
-
-FPS encourages coverage of distinct regions in the support feature distribution.
-
-### 2.5 Entropic OT-Barycentric Refinement
-
-A cost matrix is constructed between support tokens and prototype atoms. Using cosine dissimilarity:
-
-    C_(c,k)(m,p) = 1 - b_(c,m)^T u_(c,k,p)
-
-An entropy-regularized transport plan can be obtained by solving:
-
-    T* = argmin_(T in Pi(a,b))
-         <T,C> + epsilon Σ_(m,p) T(m,p) log T(m,p)
-
-Here, a and b are the prescribed transport marginals and epsilon controls entropic regularization.
-
-The atoms are updated through transport-weighted barycentric aggregation:
-
-    btilde_(c,m) =
-        [Σ_(k,p) T*_(c,k)(m,p) u_(c,k,p)]
-        / [Σ_(k,p) T*_(c,k)(m,p) + epsilon_0]
-
-The updated atom is normalized:
-
-    b_(c,m) = Normalize(btilde_(c,m))
-
-The refinement process adjusts the atoms according to their transport-based correspondence with support tokens.
-
-**Output:** A class-specific set of refined prototype atoms, with adaptive capacity M_c.
-
-## 3. Query-to-Prototype Matching (QPM) Module
-
-### 3.1 Motivation
-
-After constructing class-specific atoms, SCPT determines which class best corresponds to an unseen query. Rather than relying only on a global Euclidean or cosine distance, QPM models the correspondence between individual query tokens and class-specific prototype atoms as an optimal transport problem.
-
-### 3.2 Query Representation
-
-For query image X_q, MER generates:
-
-    U_q = {u_(q,1), u_(q,2), ..., u_(q,P)}
-
-For the example configuration:
-
-    U_q ∈ R^(196 × 128)
-
-The prototype atoms for class c are:
-
-    B_c = {b_(c,1), b_(c,2), ..., b_(c,M_c)}
-
-### 3.3 Query-Token-to-Atom Cost
-
-The pairwise cosine dissimilarity is:
-
-    C_(q,c)(p,m) = 1 - u_(q,p)^T b_(c,m)
-
-The cost matrix has dimensions:
-
-    C_(q,c) ∈ R^(P × M_c)
-
-Each entry measures the dissimilarity between a query token and a class-specific atom.
-
-### 3.4 Sinkhorn-Based Optimal Transport
-
-The query tokens and prototype atoms are treated as two distributions. QPM estimates their correspondence by solving:
-
-    T*_(q,c) = argmin_(T in Pi(a,b))
-        <T,C_(q,c)> + epsilon KL(T || ab^T)
-
-where T* is the transport plan, a and b are the query-token and prototype-atom marginals, and epsilon is the entropic regularization parameter.
-
-Sinkhorn iterations efficiently approximate the transport plan. The plan describes how query-token mass is distributed across the prototype atoms of a candidate class.
-
-### 3.5 Transport-Based Class Distance
-
-The class distance is computed as:
-
-    D(q,c) = <T*_(q,c), C_(q,c)>
-
-The predicted class is:
-
-    yhat_q = argmin_c D(q,c)
-
-Thus, the query is assigned to the class with the minimum transport cost.
-
-**Output:** Class-wise transport distances and the predicted query class.
-
-## 4. Training and Inference
-
-### 4.1 Episodic Training
+### Episodic Training
 
 For each training episode:
 
@@ -256,7 +58,7 @@ where N_q is the number of query samples, y_i is the ground-truth class, D(q_i,c
 
 The exact loss, optimization schedule, and whether the prototype refinement is differentiable should be reported according to the actual implementation.
 
-### 4.2 Inference
+### Inference
 
 For an unseen few-shot task:
 
@@ -270,20 +72,20 @@ For an unseen few-shot task:
 
 In the cross-dataset evaluation protocol, no target-dataset fine-tuning is performed.
 
-## 5. Summary of the Three Modules
+## Summary of the Three Modules
 
 - **MER — Multi-scale Embedding Representation:** Extracts multi-level image features, fuses them, and generates normalized local tokens.
 - **SAPC — Support-Adaptive Prototype Construction:** Estimates support diversity, determines the number of atoms per class, initializes them using FPS, and refines them through OT-barycentric updates.
 - **QPM — Query-to-Prototype Matching:** Computes query-token-to-atom costs, estimates Sinkhorn transport plans, and classifies queries using transport distances.
 
-## 6. Key Methodological Contributions
+## Key Methodological Contributions
 
 1. **Local token-based representation:** SCPT preserves spatially distributed local representations rather than relying exclusively on a single global image vector.
 2. **Support-diversity-driven prototype construction:** The number of prototype atoms is adapted to the observed diversity of each class's support set.
 3. **OT-based distribution matching:** Query-token distributions are compared with adaptive prototype distributions through entropy-regularized optimal transport.
 4. **Cross-domain evaluation:** The framework is evaluated across dermoscopic, endoscopic, and histopathological datasets, including cross-dataset generalization experiments.
 
-## 7. Central Research Hypothesis
+## Central Research Hypothesis
 
 Few-shot medical image classification can benefit from representing images through multi-scale local feature distributions, constructing support-diversity-aware multi-atom class prototypes, and performing distribution-level query-to-class matching through entropy-regularized optimal transport.
 
@@ -293,7 +95,7 @@ In summary:
 
 MER determines what local information is represented. SAPC determines how each class is represented. QPM determines how the query is matched against those class representations.
 
-## 8. Experimental Evaluation
+## Experimental Evaluation
 
 The SCPT framework is evaluated on:
 
