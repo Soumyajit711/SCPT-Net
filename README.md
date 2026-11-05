@@ -27,44 +27,8 @@ The framework consists of three interconnected modules:
 <img width="1561" height="422" alt="image" src="https://github.com/user-attachments/assets/a54b711f-7de3-4a7e-8b42-a780899bea64" />
 **Figure 1:** Overview of the proposed SCPT framework. MER extracts multi-scale features as normalized tokens. SAPC constructs class-specific prototypes using support diversity, farthest-point sampling, and balanced matching. QPM performs Sinkhorn-based query-to-prototype matching for class prediction.
 
-### Overall Pipeline
 
-Input medical images (support set and query image)
-    |
-    v
-MER: Multi-scale Embedding Representation
-    - Multi-scale feature extraction
-    - Feature alignment and projection
-    - Multi-scale feature fusion
-    - Local token generation and normalization
-    |
-    +-------------------------------+
-    |                               |
-    v                               v
-Support representations             Query representation
-    |                               |
-    v                               |
-SAPC: Support-Adaptive               |
-Prototype Construction               |
-    - Support-diversity estimation   |
-    - Adaptive atom capacity         |
-    - Farthest Point Sampling (FPS)  |
-    - OT-barycentric refinement      |
-    |                               |
-    +---------------+---------------+
-                    |
-                    v
-QPM: Query-to-Prototype Matching
-    - Query-token-to-atom cost computation
-    - Entropic optimal transport
-    - Sinkhorn transport-plan estimation
-    - Transport-based class distance
-                    |
-                    v
-             Predicted class
-       (minimum transport distance)
-
-## 1. Module 1: Multi-scale Embedding Representation (MER)
+## 1. Multi-scale Embedding Representation (MER) Module
 
 ### 1.1 Motivation
 
@@ -122,7 +86,7 @@ Positional information may be incorporated before L2 normalization. The same rep
 
 **Output:** A normalized set of local feature tokens for each input image.
 
-## 2. Module 2: Support-Adaptive Prototype Construction (SAPC)
+## 2. Support-Adaptive Prototype Construction (SAPC) Module
 
 ### 2.1 Motivation
 
@@ -205,7 +169,7 @@ The refinement process adjusts the atoms according to their transport-based corr
 
 **Output:** A class-specific set of refined prototype atoms, with adaptive capacity M_c.
 
-## 3. Module 3: Query-to-Prototype Matching (QPM)
+## 3. Query-to-Prototype Matching (QPM) Module
 
 ### 3.1 Motivation
 
